@@ -1,0 +1,11 @@
+
+
+1 Инициализация базы данныхОткройте командную строку (cmd) и выполните команду для создания кластера баз данных (замените пути на свои)
+C:\Users\ВашеИмя\postgres\pgsql\bin\initdb.exe -D C:\Users\ВашеИмя\postgres\data -U postgres -A scram-sha-256 -W
+D — путь к папке, где будут лежать ваши базы данных.-U postgres — имя главного суперпользователя.
+-A scram-sha-256 — современный метод шифрования паролей.-W — принудительно запросит ввести пароль для пользователя postgres.
+
+C:\Users\lykov\Documents\pgsql\bin\initdb.exe -D C:\Users\lykov\Documents\bd -U postgres -A scram-sha-256 -W
+
+2 Чтобы запустить СУБД, используйте утилиту pg_ctl
+C:\Users\lykov\Documents\pgsql\bin\pg_ctl.exe -D C:\Users\lykov\Documents\bd start
