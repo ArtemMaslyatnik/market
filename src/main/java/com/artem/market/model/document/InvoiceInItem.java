@@ -15,21 +15,36 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class InvoiceInItem extends AbstractDocumentItem {
 
-    // 1. Связь с шапкой документа (Приходной накладной)
+    // 1. Связь с шапкой прихода (document_invoice_in из Django)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "invoice_id", nullable = false)
     private InvoiceIn invoice;
 
-    // 2. Связь с каноничным товаром
+    // 2. Закупаемый товар / Номенклатура (goods из Django)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    // 3. Количество закупаемого товара (точность до 5 знаков для весового товара)
-    @Column(nullable = false, precision = 20, scale = 5)
+    // 3. Закупочная цена товара (price из Django)
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal price;
+
+    // 4. Количество (quantity из Django с точностью до 3 знаков)
+    @Column(nullable = false, precision = 20, scale = 3)
     private BigDecimal quantity;
 
-    // 4. Сумма по строке
+    // 5. Сумма по строке (amount из Django)
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
+
+    /**
+     * Автоматический расчет суммы строки (Цена * Количество)
+     * с каноническим банковским округлением половины к ближайшему чётному числу.
+     */
+    public void calculateAmount() {
+        if (this.price != null && this.quantity != null) {
+            this.amount = this.price.multiply(this.quantity)
+                    .setScale(2, java.math.RoundingMode.HALF_EVEN);
+        }
+    }
 }

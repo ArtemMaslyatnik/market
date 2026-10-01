@@ -14,4 +14,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Company extends AbstractCatalog {
 
+    // Канонично: сущность сама управляет своими внутренними инвариантами
+    public void initAsCompany() {
+        this.setIsGroup(false);
+        this.setParent(null);
+    }
 }

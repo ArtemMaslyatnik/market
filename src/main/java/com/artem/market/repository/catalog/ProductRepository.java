@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    // Готово! Методы поиска, сохранения и удаления сгенерированы автоматически
+    // Автоматически сгенерирует эффективный SQL: SELECT EXISTS(SELECT 1 FROM products WHERE parent_id = ?)
+    boolean existsByParentId(Long parentId);
 }

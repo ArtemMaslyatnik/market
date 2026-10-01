@@ -26,6 +26,6 @@ public class StockTransferItem extends AbstractDocumentItem {
     private Product product;
 
     // 3. Количество перемещаемого товара
-    @Column(nullable = false, precision = 20, scale = 3)
+    @Column(nullable = false, precision = 20, scale = 5)
     private BigDecimal quantity;
 }

@@ -25,11 +25,15 @@ public class InvoiceOutItem extends AbstractDocumentItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    // 3. Количество товара (с точностью до 5 знаков для весового товара)
+    // 3. Цена товара за единицу (price из Django)
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal price;
+
+    // 4. Количество товара (с точностью до 5 знаков для весового товара)
     @Column(nullable = false, precision = 20, scale = 5)
     private BigDecimal quantity;
 
-    // 4. Сумма по строке
+    // 5. Сумма по строке
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 }

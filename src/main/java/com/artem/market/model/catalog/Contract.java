@@ -1,5 +1,6 @@
 package com.artem.market.model.catalog;
 
+import com.artem.market.domain.partner.entity.Partner;
 import com.artem.market.model.base.AbstractCatalog;
 import jakarta.persistence.*;
 import lombok.Getter;

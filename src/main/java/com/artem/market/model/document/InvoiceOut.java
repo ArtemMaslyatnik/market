@@ -1,6 +1,8 @@
 package com.artem.market.model.document;
 
+import com.artem.market.domain.partner.entity.Partner;
 import com.artem.market.model.base.AbstractDocument;
+import com.artem.market.model.catalog.*;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,16 +18,34 @@ import java.util.List;
 @NoArgsConstructor
 public class InvoiceOut extends AbstractDocument {
 
-    // 1. Общая сумма документа
+    // 1. Организация (Наша фирма)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
+
+    // 2. Контрагент (Клиент / Покупатель)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "partner_id", nullable = false)
+    private Partner partner;
+
+    // 3. Договор с контрагентом
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contract_id")
+    private Contract contract;
+
+    // 4. Склад списания
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "warehouse_id", nullable = false)
+    private Warehouse warehouse;
+
+    // 5. Общая сумма документа
     @Column(name = "total_amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal totalAmount;
 
-    // 2. Связь с табличной частью (Список строк товаров)
-    // CascadeType.ALL означает: если мы удалим документ, его строки удалятся автоматически
+    // 6. Связь с табличной частью товаров
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvoiceOutItem> items = new ArrayList<>();
 
-    // Удобный метод для добавления строки в документ
     public void addItem(InvoiceOutItem item) {
         this.items.add(item);
         item.setInvoice(this);

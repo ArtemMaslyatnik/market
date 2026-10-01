@@ -1,6 +1,7 @@
 package com.artem.market.model.document;
 
 import com.artem.market.model.base.AbstractDocument;
+import com.artem.market.model.catalog.Company;
 import com.artem.market.model.catalog.Warehouse;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -16,21 +17,26 @@ import java.util.List;
 @NoArgsConstructor
 public class StockTransfer extends AbstractDocument {
 
-    // 1. Склад-отправитель
+    // 1. Организация (company из Django, related_name='companies_movements')
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
+
+    // 2. Склад-отправитель (warehouse_out из Django, related_name='outgoing_movements')
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "source_warehouse_id", nullable = false)
     private Warehouse sourceWarehouse;
 
-    // 2. Склад-получатель
+    // 3. Склад-получатель (warehouse_in из Django, related_name='incoming_movements')
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "destination_warehouse_id", nullable = false)
     private Warehouse destinationWarehouse;
 
-    // 3. Связь с табличной частью товаров
+    // 4. Связь с табличной частью перемещаемых товаров
     @OneToMany(mappedBy = "transfer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StockTransferItem> items = new ArrayList<>();
 
-    // Удобный метод для добавления строки в коллекцию
+    // Удобный метод для добавления строк в документ перемещения
     public void addItem(StockTransferItem item) {
         this.items.add(item);
         item.setTransfer(this);

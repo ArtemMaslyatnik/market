@@ -1,6 +1,7 @@
 package com.artem.market.model.catalog;
 
 import com.artem.market.model.base.AbstractCatalog;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,8 @@ public class ProductCategory extends AbstractCatalog {
     @JoinColumn(name = "parent_id")
     private ProductCategory parent;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // Защита от бесконечной циклической вложенности в JSON
     private List<ProductCategory> children = new ArrayList<>();
 
     // Зеркальное поле для двусторонней связи Многие-ко-многим
