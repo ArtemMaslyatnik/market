@@ -1,4 +1,4 @@
-package com.artem.market.model.catalog;
+package com.artem.market.domain.warehouse.entity;
 
 import com.artem.market.model.base.AbstractCatalog;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,13 +16,13 @@ import java.util.List;
 @NoArgsConstructor
 public class Warehouse extends AbstractCatalog {
 
-    // Ссылка на родительскую группу складов (для поддержки иерархии)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
+    @JsonIgnore
     private Warehouse parent;
 
     // Список подскладов или элементов внутри группы
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore // Защита от бесконечной циклической вложенности в JSON
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Warehouse> children = new ArrayList<>();
 }

@@ -1,8 +1,10 @@
 package com.artem.market.model.document;
 
+import com.artem.market.domain.company.entity.Company;
+import com.artem.market.domain.contract.entity.Contract;
 import com.artem.market.domain.partner.entity.Partner;
+import com.artem.market.domain.warehouse.entity.Warehouse;
 import com.artem.market.model.base.AbstractDocument;
-import com.artem.market.model.catalog.*;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

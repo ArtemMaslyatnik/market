@@ -27,7 +27,7 @@ public class PartnerController {
     @GetMapping
     @Operation(summary = "Получить список всех партнеров и групп")
     public List<PartnerResponse> getAll() {
-        return service.getAll().stream().map(mapper::toResponse).collect(Collectors.toList());
+        return service.getAll().stream().map(mapper::toResponse).toList();
     }
 
     @GetMapping("/{id}")
@@ -41,16 +41,15 @@ public class PartnerController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Создать нового партнера или группу")
     public PartnerResponse create(@Valid @RequestBody PartnerRequest request) {
-        Partner entity = mapper.toEntity(request);
-        Partner savedEntity = service.create(entity);
+        Partner savedEntity = service.create(request);
         return mapper.toResponse(savedEntity);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Обновить существующего партнера или группу")
     public PartnerResponse update(@PathVariable Long id, @Valid @RequestBody PartnerRequest request) {
-        Partner entity = mapper.toEntity(request);
-        Partner updatedEntity = service.update(id, entity);
+        // Контроллер стал ультра-тонким, просто передает DTO запроса в сервис
+        Partner updatedEntity = service.update(id, request);
         return mapper.toResponse(updatedEntity);
     }
 

@@ -1,4 +1,4 @@
-package com.artem.market.model.catalog;
+package com.artem.market.domain.company.entity;
 
 import com.artem.market.model.base.AbstractCatalog;
 import jakarta.persistence.Entity;
@@ -14,9 +14,4 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Company extends AbstractCatalog {
 
-    // Канонично: сущность сама управляет своими внутренними инвариантами
-    public void initAsCompany() {
-        this.setIsGroup(false);
-        this.setParent(null);
-    }
 }

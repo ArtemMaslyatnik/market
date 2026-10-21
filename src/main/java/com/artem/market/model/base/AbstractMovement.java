@@ -12,14 +12,10 @@ enum MovementType {
 
 @MappedSuperclass // Базовый класс для таблиц движений
 @Getter @Setter
-public abstract class AbstractMovement {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public abstract class AbstractMovement extends AbstractBaseEntity{
 
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
+    private Boolean active = true;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "movement_type", nullable = false, length = 20)
@@ -38,5 +34,10 @@ public abstract class AbstractMovement {
 
     // 5. Точная дата и время проведения транзакции
     @Column(name = "movement_date", nullable = false)
-    private LocalDateTime movementDate = LocalDateTime.now();
+    private LocalDateTime movementDate;
+
+    @PrePersist
+    protected void onMovementCreate() {
+        movementDate = LocalDateTime.now();
+    }
 }

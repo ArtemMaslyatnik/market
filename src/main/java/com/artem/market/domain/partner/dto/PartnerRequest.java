@@ -15,9 +15,8 @@ public class PartnerRequest {
     @Size(max = 50, message = "Длина наименования не должна превышать 50 символов")
     private String name;
 
-    private Boolean isGroup;
-    private Boolean isDeleted;
+    private Boolean group;
+    private Boolean deleted;
 
-    // Передаем плоский ID родителя вместо целого объекта с фронтенда
     private Long parentId;
 }

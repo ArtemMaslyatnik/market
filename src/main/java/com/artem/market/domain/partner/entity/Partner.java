@@ -1,7 +1,7 @@
 package com.artem.market.domain.partner.entity;
 
 import com.artem.market.model.base.AbstractCatalog;
-import com.artem.market.model.catalog.Contract;
+import com.artem.market.domain.contract.entity.Contract;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,18 +17,18 @@ import java.util.List;
 @NoArgsConstructor
 public class Partner extends AbstractCatalog {
 
-    // 1. Ссылка на родительскую группу (папку контрагентов)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
+    @JsonIgnore
     private Partner parent;
 
     // 2. Список дочерних элементов/папок внутри этой группы
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore // Защита от бесконечной циклической вложенности в JSON
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Partner> children = new ArrayList<>();
 
     // 3. Связь с договорами
-    @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore // Игнорируем при базовом запросе контрагента, чтобы не грузить лишние данные
+    @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Contract> contracts = new ArrayList<>();
 }

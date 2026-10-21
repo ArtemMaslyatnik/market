@@ -9,29 +9,16 @@ import java.time.LocalDateTime;
 @Table(name = "doc_base")
 @Inheritance(strategy = InheritanceType.JOINED) // Стратегия связи таблиц-наследников
 @Getter @Setter
-public abstract class AbstractDocument {
+public abstract class AbstractDocument extends AbstractBaseEntity{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @Column(name = "doc_number", nullable = false, unique = true, length = 50)
+    @Column(name = "doc_number", nullable = false, unique = true, length = 10)
     private String number;
 
     @Column(name = "is_posted", nullable = false)
-    private Boolean isPosted = false;
+    private boolean posted = false;
 
     @Column(name = "is_deleted", nullable = false)
-    private Boolean isDeleted = false;
+    private boolean deleted = false;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

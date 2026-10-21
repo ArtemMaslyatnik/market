@@ -6,11 +6,7 @@ import lombok.Setter;
 
 @MappedSuperclass // Базовый класс для всех табличных частей документов
 @Getter @Setter
-public abstract class AbstractDocumentItem {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public abstract class AbstractDocumentItem extends AbstractBaseEntity {
 
     @Column(name = "line_number", nullable = false)
     private Integer lineNumber;
