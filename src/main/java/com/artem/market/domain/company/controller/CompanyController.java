@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/companies")
 @RequiredArgsConstructor
-@Tag(name = "2. Справочник Организаций")
+@Tag(name = "2. Catalog companies")
 public class CompanyController {
 
     private final CompanyService service;

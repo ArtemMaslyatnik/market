@@ -22,13 +22,11 @@ public class Partner extends AbstractCatalog {
     @JsonIgnore
     private Partner parent;
 
-    // 2. Список дочерних элементов/папок внутри этой группы
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Partner> children = new ArrayList<>();
 
-    // 3. Связь с договорами
-    @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "partner", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Contract> contracts = new ArrayList<>();
 }

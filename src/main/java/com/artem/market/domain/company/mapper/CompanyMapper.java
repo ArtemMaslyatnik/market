@@ -14,19 +14,17 @@ import org.mapstruct.MappingTarget;
 )
 public interface CompanyMapper {
 
-    // 1. Из Сущности в Response DTO
     CompanyResponse toResponse(Company entity);
 
-    // 2. Из Request DTO в новую Сущность (для POST / create)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "group", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     Company toEntity(CompanyRequest request);
 
-    // 3. Частичное обновление существующей сущности из БД (для PUT / update)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "group", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     void updateEntityFromRequest(CompanyRequest request,

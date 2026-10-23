@@ -29,6 +29,7 @@ public interface WarehouseMapper {
     @Mapping(target = "updatedAt", ignore = true)
     void updateEntityFromRequest(
             WarehouseRequest request,
-            @MappingTarget Warehouse existingEntity);
+            @MappingTarget Warehouse existingEntity
+    );
 
 }

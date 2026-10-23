@@ -1,12 +1,15 @@
 package com.artem.market.domain.partner.mapper;
 
+import com.artem.market.domain.contract.mapper.ContractMapper;
 import com.artem.market.domain.partner.dto.PartnerRequest;
 import com.artem.market.domain.partner.dto.PartnerResponse;
 import com.artem.market.domain.partner.entity.Partner;
-import com.artem.market.model.base.context.JpaContext;
 import org.mapstruct.*;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        uses = {ContractMapper.class}
+)
 public interface PartnerMapper {
 
     @Mapping(source = "parent.id", target = "parentId")
@@ -14,21 +17,23 @@ public interface PartnerMapper {
     PartnerResponse toResponse(Partner entity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(source = "parentId", target = "parent")
+    @Mapping(target = "parent", ignore = true)
+    @Mapping(target = "children", ignore = true)
+    @Mapping(target = "contracts", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    Partner toEntity( PartnerRequest request, @Context JpaContext context );
+    Partner toEntity( PartnerRequest request);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "parent", ignore = true)
+    @Mapping(target = "children", ignore = true)
+    @Mapping(target = "contracts", ignore = true)
+    @Mapping(target = "group", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(source = "parentId", target = "parent.id")
     void updateEntityFromRequest(
             PartnerRequest request,
-            @MappingTarget Partner existingEntity,
-            @Context JpaContext context );
-
-    default Partner mapIdToEntity( Long id, @Context JpaContext context ) {
-        return context.resolveEntity(id, Partner.class);
-    }
+            @MappingTarget Partner existingEntity
+    );
 }

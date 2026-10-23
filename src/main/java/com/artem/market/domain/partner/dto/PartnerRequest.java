@@ -17,6 +17,5 @@ public class PartnerRequest {
 
     private Boolean group;
     private Boolean deleted;
-
     private Long parentId;
 }

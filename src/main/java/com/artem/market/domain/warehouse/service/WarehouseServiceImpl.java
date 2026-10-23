@@ -5,7 +5,6 @@ import com.artem.market.domain.warehouse.dto.WarehouseRequest;
 import com.artem.market.domain.warehouse.entity.Warehouse;
 import com.artem.market.domain.warehouse.mapper.WarehouseMapper;
 import com.artem.market.domain.warehouse.repository.WarehouseRepository;
-import com.artem.market.model.base.context.JpaContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,19 +17,15 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     private final WarehouseRepository repository;
     private final WarehouseMapper mapper;
-    private final JpaContext jpaContext;
+
 
     @Override
     @Transactional(readOnly = true)
-    public List<Warehouse> getAll() {
-        return repository.findAll();
-    }
+    public List<Warehouse> getAll() { return repository.findAll(); }
 
     @Override
     @Transactional(readOnly = true)
-    public Warehouse getById(Long id) {
-        return findWarehouse(id);
-    }
+    public Warehouse getById(Long id) { return findWarehouse(id); }
 
     @Override
     @Transactional
@@ -48,7 +43,6 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Transactional
     public Warehouse update(Long id, WarehouseRequest request) {
         Warehouse existing = findWarehouse(id);
-
         Warehouse newParent = request.getParentId() == null
                 ? null
                 : findValidParent(request.getParentId());
@@ -62,25 +56,23 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         // Нельзя назначить склад родителем самому себе // или одному из его потомков.
         if (newParent != null && isDescendantOrSelf(newParent, id)) {
-            throw new BusinessRuleException( "Нельзя назначить родителем самого себя или дочерний склад" );
+            throw new BusinessRuleException( "Нельзя назначить родителем самого себя или дочерний элемент" );
         }
 
         // Группа  не может стать элементом.
         if (existing.isGroup() && !targetIsGroup) {
-            throw new BusinessRuleException( "Нельзя изменить группу на элемент");
+            throw new BusinessRuleException("Нельзя изменить группу на элемент");
         }
 
         if (!existing.isGroup() && targetIsGroup) {
-            throw new BusinessRuleException( "Запрещено изменять обычный склад на группу" );
+            throw new BusinessRuleException( "Запрещено изменять элемент на группу" );
         }
 
-        // Нельзя удалить группу, пока в ней есть активные дочерние склады.
         if (existing.isGroup() && targetIsDeleted
                 && repository.existsByParentId(id)) {
-            throw new BusinessRuleException( "Нельзя удалить группу, пока она содержит активные склады" );
+            throw new BusinessRuleException( "Нельзя пометить на удаление группу, пока в ней содержатся активные элементы" );
         }
 
-        // Накатываем изменения
         mapper.updateEntityFromRequest(request, existing);
 
         existing.setGroup(targetIsGroup);
@@ -96,28 +88,24 @@ public class WarehouseServiceImpl implements WarehouseService {
         Warehouse warehouse = findWarehouse(id);
 
         if (warehouse.isGroup() && repository.existsByParentId(id)) {
-            throw new BusinessRuleException("Нельзя пометить на удаление группу, пока в ней содержатся элементы");
+            throw new BusinessRuleException("Нельзя пометить на удаление группу, пока в ней содержатся активные элементы");
         }
-
         warehouse.setDeleted(true);
-
         return repository.save(warehouse);
     }
 
     private Warehouse findWarehouse(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new BusinessRuleException("Склад не найден"));
+                .orElseThrow(() -> new BusinessRuleException("Элемент не найден"));
     }
 
     private Warehouse findValidParent(Long parentId) {
         Warehouse parent = repository.findById(parentId)
                 .orElseThrow(() ->
-                        new BusinessRuleException("Группа складов не найдена"));
-
+                        new BusinessRuleException("Группа не найдена"));
         if (!parent.isGroup()) {
-            throw new BusinessRuleException( "Родительский склад должен быть группой" );
+            throw new BusinessRuleException( "Родитель должен быть группой" );
         }
-
         return parent;
     }
 

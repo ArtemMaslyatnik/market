@@ -42,8 +42,7 @@ public class CompanyServiceImpl implements CompanyService {
     public Company update(Long id, CompanyRequest request) {
         Company existing = findCompany(id);
 
-        // 1. Безопасно накатываем данные из DTO запроса на сущность из БД
-        mapper.updateEntityFromRequest(request, existing);
+          mapper.updateEntityFromRequest(request, existing);
 
         if (request.getDeleted() != null) {
             existing.setDeleted(request.getDeleted());
@@ -64,6 +63,6 @@ public class CompanyServiceImpl implements CompanyService {
     private Company findCompany(Long id) {
         return repository.findById(id)
                 .orElseThrow(() ->
-                        new BusinessRuleException("Организация не найдена"));
+                        new BusinessRuleException("Компания не найдена"));
     }
 }

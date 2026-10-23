@@ -21,23 +21,19 @@ public interface ContractMapper {
     @Mapping(target = "group", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "company", source = "companyId")
-    @Mapping(target = "partner", source = "partnerId")
-    Contract toEntity(ContractRequest request ,@Context JpaContext context);
+    @Mapping(target = "company", ignore = true)
+    @Mapping(target = "partner", ignore = true)
+    Contract toEntity(ContractRequest request);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "group", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "partnerId", ignore = true)
+    @Mapping(target = "companyId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(source = "partnerId", target = "partner")
-    @Mapping(source = "companyId", target = "company")
-    void updateEntityFromRequest(ContractRequest request, @MappingTarget Contract contract, @Context JpaContext context);
+    void updateEntityFromRequest(ContractRequest request,
+                                 @MappingTarget Contract contract
+    );
 
-    default Company mapCompanyIdToEntity(Long id, @Context JpaContext context) {
-        return id == null ? null : context.resolveEntity(id, Company.class);
-    }
-
-    default Partner mapPartnerIdToEntity(Long id, @Context JpaContext context) {
-        return id == null ? null : context.resolveEntity(id, Partner.class);
-    }
 }

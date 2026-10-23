@@ -1,15 +1,12 @@
 package com.artem.market.domain.contract.service;
 
 import com.artem.market.domain.company.entity.Company;
-import com.artem.market.domain.company.repository.CompanyRepository;
 import com.artem.market.domain.contract.dto.ContractRequest;
 import com.artem.market.domain.contract.entity.Contract;
 import com.artem.market.domain.contract.mapper.ContractMapper;
 import com.artem.market.domain.contract.repository.ContractRepository;
 import com.artem.market.domain.partner.entity.Partner;
-import com.artem.market.domain.partner.repository.PartnerRepository;
 import com.artem.market.exception.BusinessRuleException;
-import com.artem.market.model.base.context.JpaContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +18,8 @@ import java.util.List;
 public class ContractServiceImpl implements ContractService {
 
     private final ContractRepository repository;
-    private final CompanyRepository companyRepository;
-    private final PartnerRepository partnerRepository;
     private final ContractMapper mapper;
-    private final JpaContext jpaContext;
+
 
     @Override
     @Transactional(readOnly = true)
@@ -40,31 +35,39 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     @Transactional
-    public Contract create(ContractRequest request) {
-        findCompany(request.getCompanyId());
-        findPartner(request.getPartnerId());
+    public Contract create(ContractRequest request, Company company, Partner partner) {
 
-        Contract contract = mapper.toEntity(request, jpaContext);
-
+        Contract contract = mapper.toEntity(request);
+        contract.setCompany(company);
+        contract.setPartner(partner);
         return repository.save(contract);
+
     }
 
     @Override
     @Transactional
-    public Contract update(Long id, ContractRequest request) {
+    public Contract update(Long id, ContractRequest request, Company company, Partner partner) {
         Contract existing = findContract(id);
 
-        if (request.getCompanyId() != null) {
-            findCompany(request.getCompanyId());
-        }
+        boolean targetIsDeleted = request.getDeleted() != null
+                ? request.getDeleted()
+                : existing.isDeleted();
 
-        if (request.getPartnerId() != null) {
-            findPartner(request.getPartnerId());
-        }
-
-        mapper.updateEntityFromRequest(request, existing, jpaContext);
+        mapper.updateEntityFromRequest(request, existing);
+        existing.setDeleted(targetIsDeleted);
 
         return repository.save(existing);
+    }
+
+    @Override
+    @Transactional
+    public Contract toggleDeleteStatus(Long id) {
+        Contract contract = repository.findById(id)
+                .orElseThrow(() -> new BusinessRuleException("Договор не найден"));
+
+        contract.setDeleted(!contract.isDeleted());
+
+        return repository.save(contract);
     }
 
     @Override
@@ -80,18 +83,6 @@ public class ContractServiceImpl implements ContractService {
         return repository.findById(id)
                 .orElseThrow(() ->
                         new BusinessRuleException("Договор не найден"));
-    }
-
-    private Company findCompany(Long id) {
-        return companyRepository.findById(id)
-                .orElseThrow(() ->
-                        new BusinessRuleException("Компания не найдена"));
-    }
-
-    private Partner findPartner(Long id) {
-        return partnerRepository.findById(id)
-                .orElseThrow(() ->
-                        new BusinessRuleException("Контрагент не найден"));
     }
 }
 
