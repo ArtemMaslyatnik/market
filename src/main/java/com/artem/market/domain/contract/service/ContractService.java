@@ -12,6 +12,6 @@ public interface ContractService {
     Contract getById(Long id);
     Contract create(ContractRequest request, Company company, Partner partner);
     Contract update(Long id, ContractRequest request, Company company, Partner partner);
-    Contract delete(Long id);
+    void delete(Long id);
     Contract toggleDeleteStatus(Long id);
 }

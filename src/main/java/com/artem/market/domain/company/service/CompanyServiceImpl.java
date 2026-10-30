@@ -1,5 +1,6 @@
 package com.artem.market.domain.company.service;
 
+import com.artem.market.domain.partner.entity.Partner;
 import com.artem.market.exception.BusinessRuleException;
 import com.artem.market.domain.company.dto.CompanyRequest;
 import com.artem.market.domain.company.entity.Company;
@@ -53,11 +54,18 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     @Transactional
-    public Company delete(Long id) {
-        Company existing = findCompany(id);
+    public Company toggleDeleteStatus(Long id) {
+        Company company = findCompany(id);
+        company.setDeleted(!company.isDeleted());
 
-        existing.setDeleted(true);
-        return repository.save(existing);
+        return repository.save(company);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        Company existing = findCompany(id);
+        repository.delete(existing);
     }
 
     private Company findCompany(Long id) {

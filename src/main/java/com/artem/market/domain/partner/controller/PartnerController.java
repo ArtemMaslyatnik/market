@@ -10,10 +10,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/partners")
@@ -48,15 +48,21 @@ public class PartnerController {
     @PutMapping("/{id}")
     @Operation(summary = "Обновить существующего партнера или группу")
     public PartnerResponse update(@PathVariable Long id, @Valid @RequestBody PartnerRequest request) {
-        // Контроллер стал ультра-тонким, просто передает DTO запроса в сервис
         Partner updatedEntity = service.update(id, request);
         return mapper.toResponse(updatedEntity);
     }
 
+    @PatchMapping("/{id}/toggle-delete")
+    @Operation(summary = "Toggle partner deletion status (Delete/Restore)")
+    public PartnerResponse toggleDelete(@PathVariable Long id) {
+        Partner updatedEntity = service.toggleDeleteStatus(id);
+        return mapper.toResponse(updatedEntity);
+    }
+
     @DeleteMapping("/{id}")
-    @Operation(summary = "Пометить партнера или группу на удаление (мягкое удаление)")
-    public PartnerResponse delete(@PathVariable Long id) {
-        Partner deletedEntity = service.delete(id);
-        return mapper.toResponse(deletedEntity);
+    @Operation(summary = "Delete a partner")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

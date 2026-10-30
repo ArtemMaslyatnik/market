@@ -10,10 +10,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/api/v1/companies")
@@ -50,10 +51,18 @@ public class CompanyController {
         return mapper.toResponse(updated);
     }
 
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Soft delete a company")
-    public CompanyResponse delete(@PathVariable Long id) {
+    @PatchMapping("/{id}/toggle-delete")
+    @Operation(summary = "Toggle partner deletion status (Delete/Restore)")
+    public CompanyResponse toggleDelete(@PathVariable Long id) {
+        Company updatedEntity = service.toggleDeleteStatus(id);
+        return mapper.toResponse(updatedEntity);
 
-        return mapper.toResponse(service.delete(id));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a company")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

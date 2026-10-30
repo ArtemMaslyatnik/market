@@ -9,5 +9,6 @@ public interface WarehouseService {
     Warehouse getById(Long id);
     Warehouse create(WarehouseRequest request);
     Warehouse update(Long id, WarehouseRequest request);
-    Warehouse delete(Long id);
+    Warehouse toggleDeleteStatus(Long id);
+    void delete(Long id);
 }

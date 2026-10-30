@@ -9,5 +9,6 @@ public interface PartnerService {
     Partner getById(Long id);
     Partner create(PartnerRequest request);
     Partner update(Long id, PartnerRequest request);
-    Partner delete(Long id);
+    Partner toggleDeleteStatus(Long id);
+    void delete(Long id);
 }

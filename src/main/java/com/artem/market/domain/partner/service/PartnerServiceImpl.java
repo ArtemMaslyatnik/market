@@ -83,13 +83,21 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     @Transactional
-    public Partner delete(Long id) {
+    public Partner toggleDeleteStatus(Long id) {
+        Partner partner = findPartner(id);
+        partner.setDeleted(!partner.isDeleted());
+
+        return repository.save(partner);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
         Partner partner = findPartner(id);
         if (partner.isGroup() && repository.existsByParentId(id)) {
             throw new BusinessRuleException( "Нельзя пометить на удаление группу, пока в ней содержатся активные элементы" );
         }
-        partner.setDeleted(true);
-        return repository.save(partner);
+        repository.delete(partner);
     }
 
     private Partner findPartner(Long id) {

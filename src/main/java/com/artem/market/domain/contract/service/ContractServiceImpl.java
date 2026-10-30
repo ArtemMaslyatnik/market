@@ -62,9 +62,7 @@ public class ContractServiceImpl implements ContractService {
     @Override
     @Transactional
     public Contract toggleDeleteStatus(Long id) {
-        Contract contract = repository.findById(id)
-                .orElseThrow(() -> new BusinessRuleException("Договор не найден"));
-
+        Contract contract = findContract(id);
         contract.setDeleted(!contract.isDeleted());
 
         return repository.save(contract);
@@ -72,11 +70,9 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     @Transactional
-    public Contract delete(Long id) {
+    public void delete(Long id) {
         Contract contract = findContract(id);
-        contract.setDeleted(true);
-
-        return repository.save(contract);
+        repository.delete(contract);
     }
 
     private Contract findContract(Long id) {

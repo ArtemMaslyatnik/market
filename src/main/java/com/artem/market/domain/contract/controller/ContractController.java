@@ -52,8 +52,9 @@ public class ContractController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Soft delete a contract")
-    public ResponseEntity<ContractResponse> delete(@PathVariable Long id) {
-        return ResponseEntity.ok(contractFacade.deleteContract(id));
+    @Operation(summary = "Delete a contract")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        contractFacade.deleteContract(id);
+        return ResponseEntity.noContent().build();
     }
 }

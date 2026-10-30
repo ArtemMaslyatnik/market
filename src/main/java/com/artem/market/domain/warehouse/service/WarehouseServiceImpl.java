@@ -82,16 +82,25 @@ public class WarehouseServiceImpl implements WarehouseService {
         return repository.save(existing);
     }
 
+
     @Override
     @Transactional
-    public Warehouse delete(Long id) {
+    public Warehouse toggleDeleteStatus(Long id) {
+        Warehouse warehouse = findWarehouse(id);
+        warehouse.setDeleted(!warehouse.isDeleted());
+
+        return repository.save(warehouse);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
         Warehouse warehouse = findWarehouse(id);
 
         if (warehouse.isGroup() && repository.existsByParentId(id)) {
             throw new BusinessRuleException("Нельзя пометить на удаление группу, пока в ней содержатся активные элементы");
         }
-        warehouse.setDeleted(true);
-        return repository.save(warehouse);
+        repository.delete(warehouse);
     }
 
     private Warehouse findWarehouse(Long id) {

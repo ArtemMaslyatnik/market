@@ -5,8 +5,10 @@ import com.artem.market.domain.warehouse.dto.WarehouseResponse;
 import com.artem.market.domain.warehouse.entity.Warehouse;
 import org.mapstruct.*;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(
+        componentModel = MappingConstants.ComponentModel.SPRING,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface WarehouseMapper {
 
     @Mapping(source = "parent.id", target = "parentId")

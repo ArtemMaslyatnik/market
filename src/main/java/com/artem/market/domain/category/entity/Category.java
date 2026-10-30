@@ -1,5 +1,6 @@
-package com.artem.market.model.catalog;
+package com.artem.market.domain.category.entity;
 
+import com.artem.market.domain.product.entity.Product;
 import com.artem.market.model.base.AbstractCatalog;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -10,19 +11,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "product_categories")
+@Table(name = "categories")
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProductCategory extends AbstractCatalog {
+public class Category extends AbstractCatalog {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
-    private ProductCategory parent;
+    @JsonIgnore
+    private Category parent;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore // Защита от бесконечной циклической вложенности в JSON
-    private List<ProductCategory> children = new ArrayList<>();
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Category> children = new ArrayList<>();
 
     // Зеркальное поле для двусторонней связи Многие-ко-многим
     @ManyToMany(mappedBy = "categories") // Указывает на имя поля в классе Product

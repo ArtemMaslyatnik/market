@@ -81,9 +81,8 @@ public class ContractFacade {
     }
 
     @Transactional
-    public ContractResponse deleteContract(Long id) {
-        Contract deleted = contractService.delete(id);
-        return contractMapper.toResponse(deleted);
+    public void deleteContract(Long id) {
+        contractService.delete(id);
     }
 
     private Partner findValidPartner(Long partnerId) {

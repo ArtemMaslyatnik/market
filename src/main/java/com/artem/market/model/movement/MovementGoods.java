@@ -2,7 +2,7 @@ package com.artem.market.model.movement;
 
 import com.artem.market.model.base.AbstractMovement;
 import com.artem.market.domain.company.entity.Company; // Импортируем Организацию
-import com.artem.market.model.catalog.Product;
+import com.artem.market.domain.product.entity.Product;
 import com.artem.market.domain.warehouse.entity.Warehouse;
 import com.artem.market.model.document.InvoiceIn;
 import jakarta.persistence.*;

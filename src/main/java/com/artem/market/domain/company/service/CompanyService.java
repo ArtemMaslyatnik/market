@@ -2,6 +2,8 @@ package com.artem.market.domain.company.service;
 
 import com.artem.market.domain.company.dto.CompanyRequest;
 import com.artem.market.domain.company.entity.Company;
+
+
 import java.util.List;
 
 public interface CompanyService {
@@ -9,5 +11,6 @@ public interface CompanyService {
     Company getById(Long id);
     Company create(CompanyRequest request);
     Company update(Long id, CompanyRequest request);
-    Company delete(Long id);
+    Company toggleDeleteStatus(Long id);
+    void delete(Long id);
 }

@@ -2,6 +2,7 @@ package com.artem.market.domain.warehouse.controller;
 
 import com.artem.market.domain.warehouse.dto.WarehouseRequest;
 import com.artem.market.domain.warehouse.dto.WarehouseResponse;
+import com.artem.market.domain.warehouse.entity.Warehouse;
 import com.artem.market.domain.warehouse.mapper.WarehouseMapper;
 import com.artem.market.domain.warehouse.service.WarehouseService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,9 +51,17 @@ public class WarehouseController {
         return mapper.toResponse(service.update(id, request));
     }
 
+    @PatchMapping("/{id}/toggle-delete")
+    @Operation(summary = "Toggle warehouse deletion status (Delete/Restore)")
+    public WarehouseResponse toggleDelete(@PathVariable Long id) {
+        Warehouse updatedEntity = service.toggleDeleteStatus(id);
+        return mapper.toResponse(updatedEntity);
+    }
+
     @DeleteMapping("/{id}")
-    @Operation(summary = "Пометить склад на мягкое удаление")
-    public WarehouseResponse delete(@PathVariable Long id) {
-        return mapper.toResponse(service.delete(id));
+    @Operation(summary = "Delete a warehouse")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,7 +1,7 @@
 package com.artem.market.model.document;
 
 import com.artem.market.model.base.AbstractDocumentItem;
-import com.artem.market.model.catalog.Product;
+import com.artem.market.domain.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -21,7 +21,6 @@ public class Warehouse extends AbstractCatalog {
     @JsonIgnore
     private Warehouse parent;
 
-    // Список подскладов или элементов внутри группы
     @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Warehouse> children = new ArrayList<>();
