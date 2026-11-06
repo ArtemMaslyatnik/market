@@ -40,7 +40,7 @@ CREATE TABLE contracts (
                            name VARCHAR(150) NOT NULL,
                            is_group BOOLEAN NOT NULL DEFAULT FALSE,
                            is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-                           contract_date TIMESTAMP NOT NULL,
+                           contract_date DATE NOT NULL,
                            company_id BIGINT NOT NULL,
                            partner_id BIGINT NOT NULL,
                            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -66,8 +66,8 @@ CREATE TABLE warehouses (
 );
 CREATE INDEX idx_warehouses_parent ON warehouses(parent_id);
 
--- 5. PRODUCT_CATEGORIES (Категории товаров - иерархический справочник)
-CREATE TABLE product_categories (
+-- 5. CATEGORIES (Категории товаров - иерархический справочник)
+CREATE TABLE categories (
                                     id BIGSERIAL PRIMARY KEY,
                                     code VARCHAR(50) NOT NULL UNIQUE,
                                     name VARCHAR(150) NOT NULL,
@@ -77,9 +77,9 @@ CREATE TABLE product_categories (
                                     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
                                     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                    CONSTRAINT fk_category_parent FOREIGN KEY (parent_id) REFERENCES product_categories(id) ON DELETE RESTRICT
+                                    CONSTRAINT fk_category_parent FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE RESTRICT
 );
-CREATE INDEX idx_categories_parent ON product_categories(parent_id);
+CREATE INDEX idx_categories_parent ON categories(parent_id);
 
 -- 6. PRODUCTS (Номенклатура товаров - иерархический справочник)
 CREATE TABLE products (
@@ -102,7 +102,7 @@ CREATE TABLE product_to_category (
                                      category_id BIGINT NOT NULL,
                                      CONSTRAINT pk_product_to_category PRIMARY KEY (product_id, category_id),
                                      CONSTRAINT fk_p2c_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-                                     CONSTRAINT fk_p2c_category FOREIGN KEY (category_id) REFERENCES product_categories(id) ON DELETE CASCADE
+                                     CONSTRAINT fk_p2c_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 
 -- ==========================================
@@ -145,6 +145,8 @@ CREATE TABLE doc_invoice_in_items (
                                       price NUMERIC(15,2) NOT NULL,
                                       quantity NUMERIC(20,3) NOT NULL,
                                       amount NUMERIC(15,2) NOT NULL,
+                                      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                      updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                       CONSTRAINT fk_invoice_in_item FOREIGN KEY (invoice_id) REFERENCES doc_invoices_in(id) ON DELETE CASCADE,
                                       CONSTRAINT fk_invoice_in_prod FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
 );
@@ -164,6 +166,7 @@ CREATE TABLE doc_invoices_out (
                                   CONSTRAINT fk_invoice_out_contract FOREIGN KEY (contract_id) REFERENCES contracts(id) ON DELETE RESTRICT,
                                   CONSTRAINT fk_invoice_out_warehouse FOREIGN KEY (warehouse_id) REFERENCES warehouses(id) ON DELETE RESTRICT
 );
+
 -- 12. DOC_INVOICE_OUT_ITEMS (Табличная часть Расходной накладной)
 CREATE TABLE doc_invoice_out_items (
                                        id BIGSERIAL PRIMARY KEY,
@@ -173,51 +176,63 @@ CREATE TABLE doc_invoice_out_items (
                                        price NUMERIC(15,2) NOT NULL,
                                        quantity NUMERIC(20,3) NOT NULL,
                                        amount NUMERIC(15,2) NOT NULL,
+                                       created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                       updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                        CONSTRAINT fk_invoice_out_item FOREIGN KEY (invoice_id) REFERENCES doc_invoices_out(id) ON DELETE CASCADE,
                                        CONSTRAINT fk_invoice_out_prod FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
 );
 CREATE INDEX idx_invoice_out_items_doc ON doc_invoice_out_items(invoice_id);
+
 -- 13. DOC_MOVEMENTS (Перемещение товаров - расширяет doc_base)
-CREATE TABLE doc_movements (
+CREATE TABLE doc_stock_transfers (
                                id BIGINT PRIMARY KEY,
                                company_id BIGINT NOT NULL,
-                               warehouse_out_id BIGINT NOT NULL,
-                               warehouse_in_id BIGINT NOT NULL,
+                               source_warehouse_id BIGINT NOT NULL,
+                               destination_warehouse_id BIGINT NOT NULL,
                                CONSTRAINT fk_movement_base FOREIGN KEY (id) REFERENCES doc_base(id) ON DELETE CASCADE,
                                CONSTRAINT fk_movement_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE RESTRICT,
-                               CONSTRAINT fk_movement_wh_out FOREIGN KEY (warehouse_out_id) REFERENCES warehouses(id) ON DELETE RESTRICT,
-                               CONSTRAINT fk_movement_wh_in FOREIGN KEY (warehouse_in_id) REFERENCES warehouses(id) ON DELETE RESTRICT
+                               CONSTRAINT fk_movement_wh_out FOREIGN KEY (source_warehouse_id) REFERENCES warehouses(id) ON DELETE RESTRICT,
+                               CONSTRAINT fk_movement_wh_in FOREIGN KEY (destination_warehouse_id) REFERENCES warehouses(id) ON DELETE RESTRICT
 );
+
 -- 14. DOC_MOVEMENT_ITEMS (Табличная часть Перемещения товаров)
-CREATE TABLE doc_movement_items (
+CREATE TABLE doc_stock_transfer_items (
                                     id BIGSERIAL PRIMARY KEY,
                                     line_number INT NOT NULL,
-                                    movement_id BIGINT NOT NULL,
+                                    transfer_id BIGINT NOT NULL,
                                     product_id BIGINT NOT NULL,
                                     quantity NUMERIC(20,3) NOT NULL,
-                                    CONSTRAINT fk_movement_item_doc FOREIGN KEY (movement_id) REFERENCES doc_movements(id) ON DELETE CASCADE,
-                                    CONSTRAINT fk_movement_item_prod FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
+                                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                    CONSTRAINT fk_transfer_item_doc FOREIGN KEY (transfer_id) REFERENCES doc_stock_transfers(id) ON DELETE CASCADE,
+                                    CONSTRAINT fk_transfer_item_prod FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
 );
-CREATE INDEX idx_doc_movement_items_doc ON doc_movement_items(movement_id);
+CREATE INDEX idx_stock_transfer_items_doc ON doc_stock_transfer_items(transfer_id);
+
 -- ==========================================
 -- III. РЕГИСТРЫ НАКОПЛЕНИЯ (REGISTERS)
 -- ==========================================
 -- 15. MOVEMENT_GOODS (Регистр остатков и себестоимости «Товары на складах» для FIFO)
 CREATE TABLE movement_goods (
                                 id BIGSERIAL PRIMARY KEY,
-                                date TIMESTAMP NOT NULL,
-                                is_posted BOOLEAN NOT NULL DEFAULT TRUE,
+                                movement_date TIMESTAMP NOT NULL,
+                                is_active BOOLEAN NOT NULL DEFAULT TRUE,
+                                line_number INT NOT NULL,
                                 movement_type VARCHAR(10) NOT NULL, -- 'INCOMING' или 'OUTGOING'
-                                recorder_id BIGINT NOT NULL,       -- Ссылка на doc_base (Регистратор)
+                                document_id BIGINT NOT NULL,       -- Ссылка на doc_base (Регистратор)
+                                company_id BIGINT NOT NULL,
                                 warehouse_id BIGINT NOT NULL,
                                 product_id BIGINT NOT NULL,
                                 batch_id BIGINT NOT NULL,          -- Ссылка на doc_invoices_in (Партия прихода для FIFO)
                                 quantity NUMERIC(20,3) NOT NULL,   -- Общее количество (списание или приход)
                                 amount NUMERIC(15,2) NOT NULL,     -- Себестоимость партии товаров
-                                CONSTRAINT fk_movement_recorder FOREIGN KEY (recorder_id) REFERENCES doc_base(id) ON DELETE CASCADE,
+                                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                CONSTRAINT fk_movement_recorder FOREIGN KEY (document_id) REFERENCES doc_base(id) ON DELETE CASCADE,
+                                CONSTRAINT fk_movement_company FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE RESTRICT,
                                 CONSTRAINT fk_movement_warehouse FOREIGN KEY (warehouse_id) REFERENCES warehouses(id) ON DELETE RESTRICT,
                                 CONSTRAINT fk_movement_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT,
                                 CONSTRAINT fk_movement_batch FOREIGN KEY (batch_id) REFERENCES doc_invoices_in(id) ON DELETE RESTRICT
 );
-CREATE INDEX idx_movement_goods_fifo ON movement_goods (product_id, warehouse_id, date, batch_id);
-CREATE INDEX idx_movement_recorder ON movement_goods (recorder_id);
+CREATE INDEX idx_movement_goods_fifo ON movement_goods (company_id, product_id, warehouse_id, movement_date, batch_id);
+CREATE INDEX idx_movement_recorder ON movement_goods (document_id);

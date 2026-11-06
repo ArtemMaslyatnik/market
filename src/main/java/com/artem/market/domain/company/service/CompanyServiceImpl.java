@@ -1,6 +1,5 @@
 package com.artem.market.domain.company.service;
 
-import com.artem.market.domain.partner.entity.Partner;
 import com.artem.market.exception.BusinessRuleException;
 import com.artem.market.domain.company.dto.CompanyRequest;
 import com.artem.market.domain.company.entity.Company;

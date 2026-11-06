@@ -1,4 +1,4 @@
-package com.artem.market.model.document;
+package com.artem.market.domain.invoceIn.entity;
 
 import com.artem.market.model.base.AbstractDocumentItem;
 import com.artem.market.domain.product.entity.Product;
