@@ -112,7 +112,7 @@ CREATE TABLE product_to_category (
 -- 8. DOC_BASE (Журнал документов - центральная таблица наследования JOINED)
 CREATE TABLE doc_base (
                           id BIGSERIAL PRIMARY KEY,
-                          doc_number VARCHAR(50) NOT NULL UNIQUE,
+                          doc_number VARCHAR(50) NOT NULL,
                           doc_date TIMESTAMP NOT NULL,
                           is_posted BOOLEAN NOT NULL DEFAULT FALSE,
                           is_deleted BOOLEAN NOT NULL DEFAULT FALSE,

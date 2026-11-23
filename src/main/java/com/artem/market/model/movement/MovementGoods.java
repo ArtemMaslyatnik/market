@@ -4,7 +4,7 @@ import com.artem.market.model.base.AbstractMovement;
 import com.artem.market.domain.company.entity.Company; // Импортируем Организацию
 import com.artem.market.domain.product.entity.Product;
 import com.artem.market.domain.warehouse.entity.Warehouse;
-import com.artem.market.domain.invoceIn.entity.InvoiceIn;
+import com.artem.market.domain.invoicein.entity.InvoiceIn;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
 package com.artem.market.repository.document;
 
-import com.artem.market.model.document.InvoiceOut;
+import com.artem.market.domain.invoiceout.entity.InvoiceOut;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -1,10 +1,11 @@
-package com.artem.market.model.document;
+package com.artem.market.domain.invoiceout.entity;
 
 import com.artem.market.domain.company.entity.Company;
 import com.artem.market.domain.contract.entity.Contract;
 import com.artem.market.domain.partner.entity.Partner;
 import com.artem.market.domain.warehouse.entity.Warehouse;
 import com.artem.market.model.base.AbstractDocument;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,36 +21,47 @@ import java.util.List;
 @NoArgsConstructor
 public class InvoiceOut extends AbstractDocument {
 
-    // 1. Организация (Наша фирма)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", nullable = false)
+    @JoinColumn(name = "company_id")
+    @JsonIgnore
     private Company company;
 
-    // 2. Контрагент (Клиент / Покупатель)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "partner_id", nullable = false)
+    @JoinColumn(name = "partner_id")
+    @JsonIgnore
     private Partner partner;
 
-    // 3. Договор с контрагентом
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contract_id")
+    @JsonIgnore
     private Contract contract;
 
-    // 4. Склад списания
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "warehouse_id", nullable = false)
+    @JoinColumn(name = "warehouse_id")
+    @JsonIgnore
     private Warehouse warehouse;
 
-    // 5. Общая сумма документа
     @Column(name = "total_amount", nullable = false, precision = 15, scale = 2)
-    private BigDecimal totalAmount;
+    private BigDecimal totalAmount = BigDecimal.ZERO;
 
-    // 6. Связь с табличной частью товаров
     @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InvoiceOutItem> items = new ArrayList<>();
 
     public void addItem(InvoiceOutItem item) {
         this.items.add(item);
         item.setInvoice(this);
+    }
+
+    public void clearItems() {
+        this.items.forEach(item -> item.setInvoice(null));
+        this.items.clear();
+        this.totalAmount = BigDecimal.ZERO;
+    }
+
+    public void recalculateTotalAmount() {
+        this.totalAmount = this.items.stream()
+                .map(InvoiceOutItem::getAmount)
+                .filter(java.util.Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }
