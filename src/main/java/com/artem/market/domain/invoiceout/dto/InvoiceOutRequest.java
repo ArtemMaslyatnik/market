@@ -1,8 +1,11 @@
 package com.artem.market.domain.invoiceout.dto;
 
-import com.artem.market.domain.invoicein.dto.InvoiceInItemRequest;
+
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -10,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class InvoiceInRequest {
+public class InvoiceOutRequest {
 
     @NotBlank(message = "Document number cannot be empty")
     @Size(max = 10, message = "Number length must not exceed 10 characters")
@@ -30,5 +33,5 @@ public class InvoiceInRequest {
     private Boolean deleted;
 
     @Valid
-    private List<InvoiceInItemRequest> items;
+    private List<InvoiceOutItemRequest> items;
 }

@@ -2,14 +2,14 @@ package com.artem.market.domain.invoiceout.facade;
 
 import com.artem.market.domain.company.entity.Company;
 import com.artem.market.domain.company.service.CompanyService;
-import com.artem.market.domain.invoicein.dto.InvoiceInItemRequest;
-import com.artem.market.domain.invoicein.dto.InvoiceInRequest;
-import com.artem.market.domain.invoicein.dto.InvoiceInResponse;
+import com.artem.market.domain.invoiceout.dto.InvoiceOutItemRequest;
+import com.artem.market.domain.invoiceout.dto.InvoiceOutRequest;
+import com.artem.market.domain.invoiceout.dto.InvoiceOutResponse;
 import com.artem.market.domain.contract.entity.Contract;
 import com.artem.market.domain.contract.service.ContractService;
-import com.artem.market.domain.invoicein.entity.InvoiceIn;
-import com.artem.market.domain.invoicein.mapper.InvoiceInMapper;
-import com.artem.market.domain.invoicein.service.InvoiceInService;
+import com.artem.market.domain.invoiceout.entity.InvoiceOut;
+import com.artem.market.domain.invoiceout.mapper.InvoiceOutMapper;
+import com.artem.market.domain.invoiceout.service.InvoiceOutService;
 import com.artem.market.domain.partner.entity.Partner;
 import com.artem.market.domain.partner.service.PartnerService;
 import com.artem.market.domain.product.entity.Product;
@@ -29,30 +29,30 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class InvoiceInFacade {
+public class InvoiceOutFacade {
 
     private final ContractService contractService;
     private final CompanyService companyService;
     private final PartnerService partnerService;
     private final ProductService productService;
     private final WarehouseService warehouseService;
-    private final InvoiceInService invoiceInService;
-    private final InvoiceInMapper invoiceInMapper;
+    private final InvoiceOutService invoiceOutService;
+    private final InvoiceOutMapper invoiceOutMapper;
 
     @Transactional(readOnly = true)
-    public List<InvoiceInResponse> getAllInvoicesIn() {
-        return invoiceInService.getAll().stream()
-                .map(invoiceInMapper::toResponse)
+    public List<InvoiceOutResponse> getAllInvoicesOut() {
+        return invoiceOutService.getAll().stream()
+                .map(invoiceOutMapper::toResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public InvoiceInResponse getInvoiceInById(Long id) {
-        return invoiceInMapper.toResponse(invoiceInService.getById(id));
+    public InvoiceOutResponse getInvoiceOutById(Long id) {
+        return invoiceOutMapper.toResponse(invoiceOutService.getById(id));
     }
 
     @Transactional
-    public InvoiceInResponse createInvoiceIn(InvoiceInRequest request) {
+    public InvoiceOutResponse createInvoiceOut(InvoiceOutRequest request) {
         Company company = request.getCompanyId() != null
                 ? companyService.getById(request.getCompanyId())
                 : null;
@@ -68,13 +68,13 @@ public class InvoiceInFacade {
 
         Map<Long, Product> productsMap = loadProductsMap(request.getItems());
 
-        InvoiceIn invoiceIn = invoiceInService.create(request, company, partner, contract, warehouse, productsMap);
-        return invoiceInMapper.toResponse(invoiceIn);
+        InvoiceOut invoiceIn = invoiceOutService.create(request, company, partner, contract, warehouse, productsMap);
+        return invoiceOutMapper.toResponse(invoiceIn);
     }
 
     @Transactional
-    public InvoiceInResponse updateInvoiceIn(Long id, InvoiceInRequest request) {
-        InvoiceIn existing = invoiceInService.getById(id);
+    public InvoiceOutResponse updateInvoiceOut(Long id, InvoiceOutRequest request) {
+        InvoiceOut existing = invoiceOutService.getById(id);
 
         Company company = request.getCompanyId() != null
                 ? companyService.getById(request.getCompanyId())
@@ -90,25 +90,25 @@ public class InvoiceInFacade {
                 : existing.getContract();
         Map<Long, Product> productsMap = loadProductsMap(request.getItems());
 
-        InvoiceIn updated = invoiceInService.update(id, request, company, partner, contract, warehouse, productsMap);
-        return invoiceInMapper.toResponse(updated);
+        InvoiceOut updated = invoiceOutService.update(id, request, company, partner, contract, warehouse, productsMap);
+        return invoiceOutMapper.toResponse(updated);
     }
 
     @Transactional
-    public InvoiceInResponse toggleInvoiceInStatusDelete(Long id) {
-        InvoiceIn toggledInvoiceIn = invoiceInService.toggleDeleteStatus(id);
-        return invoiceInMapper.toResponse(toggledInvoiceIn);
+    public InvoiceOutResponse toggleInvoiceOutStatusDelete(Long id) {
+        InvoiceOut toggledInvoiceIn = invoiceOutService.toggleDeleteStatus(id);
+        return invoiceOutMapper.toResponse(toggledInvoiceIn);
     }
 
     @Transactional
-    public InvoiceInResponse toggleInvoiceInStatusPost(Long id) {
-        InvoiceIn toggledInvoiceIn = invoiceInService.togglePostStatus(id);
-        return invoiceInMapper.toResponse(toggledInvoiceIn);
+    public InvoiceOutResponse toggleInvoiceOutStatusPost(Long id) {
+        InvoiceOut toggledInvoiceOut = invoiceOutService.togglePostStatus(id);
+        return invoiceOutMapper.toResponse(toggledInvoiceOut);
     }
 
     @Transactional
-    public void deleteInvoiceIn(Long id) {
-        invoiceInService.delete(id);
+    public void deleteInvoiceOut(Long id) {
+        invoiceOutService.delete(id);
     }
 
     private Partner findValidPartner(Long partnerId) {
@@ -120,12 +120,12 @@ public class InvoiceInFacade {
         return partner;
     }
 
-    private Map<Long, Product> loadProductsMap(List<InvoiceInItemRequest> items) {
+    private Map<Long, Product> loadProductsMap(List<InvoiceOutItemRequest> items) {
         if (items == null || items.isEmpty()) {
             return Collections.emptyMap();
         }
         return items.stream()
-                .map(InvoiceInItemRequest::getProductId)
+                .map(InvoiceOutItemRequest::getProductId)
                 .distinct()
                 .collect(Collectors.toMap(Function.identity(), productService::getById));
     }

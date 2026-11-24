@@ -7,7 +7,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class InvoiceInItemRequest {
+public class InvoiceOutItemRequest {
 
     private Long productId;
     private Integer lineNumber;

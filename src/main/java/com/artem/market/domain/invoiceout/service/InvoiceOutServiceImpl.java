@@ -2,13 +2,12 @@ package com.artem.market.domain.invoiceout.service;
 
 import com.artem.market.domain.company.entity.Company;
 import com.artem.market.domain.contract.entity.Contract;
-import com.artem.market.domain.invoicein.dto.InvoiceInItemRequest;
-import com.artem.market.domain.invoicein.dto.InvoiceInRequest;
-import com.artem.market.domain.invoicein.entity.InvoiceIn;
-import com.artem.market.domain.invoicein.entity.InvoiceInItem;
-import com.artem.market.domain.invoicein.mapper.InvoiceInMapper;
-import com.artem.market.domain.invoicein.repository.InvoiceInRepository;
-import com.artem.market.domain.invoicein.service.InvoiceInService;
+import com.artem.market.domain.invoiceout.dto.InvoiceOutItemRequest;
+import com.artem.market.domain.invoiceout.dto.InvoiceOutRequest;
+import com.artem.market.domain.invoiceout.entity.InvoiceOut;
+import com.artem.market.domain.invoiceout.entity.InvoiceOutItem;
+import com.artem.market.domain.invoiceout.mapper.InvoiceOutMapper;
+import com.artem.market.domain.invoiceout.repository.InvoiceOutRepository;
 import com.artem.market.domain.partner.entity.Partner;
 import com.artem.market.domain.product.entity.Product;
 import com.artem.market.domain.warehouse.entity.Warehouse;
@@ -22,56 +21,56 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class InvoiceServiceImpl implements InvoiceInService {
+public class InvoiceOutServiceImpl implements InvoiceOutService {
 
-    private final InvoiceInRepository repository;
-    private final InvoiceInMapper mapper;
+    private final InvoiceOutRepository repository;
+    private final InvoiceOutMapper mapper;
 
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<InvoiceIn> getAll() { return repository.findAll(); }
 
     @Override
     @Transactional(readOnly = true)
-    public InvoiceIn getById(Long id) {
-        return findInvoiceIn(id);
+    public List<InvoiceOut> getAll() { return repository.findAll(); }
+
+    @Override
+    @Transactional(readOnly = true)
+    public InvoiceOut getById(Long id) {
+        return findInvoiceOut(id);
     }
 
     @Override
     @Transactional
-    public InvoiceIn create(InvoiceInRequest request,
+    public InvoiceOut create(InvoiceOutRequest request,
                             Company company,
                             Partner partner,
                             Contract contract,
                             Warehouse warehouse,
                             Map<Long, Product> productsMap) {
 
-        InvoiceIn invoiceIn = mapper.toEntity(request);
-        invoiceIn.setCompany(company);
-        invoiceIn.setWarehouse(warehouse);
-        invoiceIn.setPartner(partner);
-        invoiceIn.setContract(contract);
+        InvoiceOut invoiceOut = mapper.toEntity(request);
+        invoiceOut.setCompany(company);
+        invoiceOut.setWarehouse(warehouse);
+        invoiceOut.setPartner(partner);
+        invoiceOut.setContract(contract);
 
         if (request.getItems() != null) {
-            populateItems(invoiceIn, request.getItems(), productsMap);
+            populateItems(invoiceOut, request.getItems(), productsMap);
         }
 
 
-        return repository.save(invoiceIn);
+        return repository.save(invoiceOut);
     }
 
     @Override
     @Transactional
-    public InvoiceIn update(Long id,
-                            InvoiceInRequest request,
+    public InvoiceOut update(Long id,
+                            InvoiceOutRequest request,
                             Company company,
                             Partner partner,
                             Contract contract,
                             Warehouse warehouse
             ,
                             Map<Long, Product> productsMap) {
-        InvoiceIn existing = findInvoiceIn(id);
+        InvoiceOut existing = findInvoiceOut(id);
 
         boolean targetIsDeleted = request.getDeleted() != null
                 ? request.getDeleted()
@@ -83,9 +82,9 @@ public class InvoiceServiceImpl implements InvoiceInService {
         existing.setPartner(partner);
         existing.setContract(contract);
         existing.setDeleted(targetIsDeleted);
-        existing.setDeleted(targetIsDeleted);
 
-        if (request.getItems() != null) { // перезаписываем табличную часть при обновлении
+
+        if (request.getItems() != null) {
             existing.clearItems();
             populateItems(existing, request.getItems(), productsMap);
         }
@@ -95,59 +94,60 @@ public class InvoiceServiceImpl implements InvoiceInService {
 
     @Override
     @Transactional
-    public InvoiceIn toggleDeleteStatus(Long id) {
-        InvoiceIn invoiceIn = findInvoiceIn(id);
-        invoiceIn.setDeleted(!invoiceIn.isDeleted());
+    public InvoiceOut toggleDeleteStatus(Long id) {
+        InvoiceOut invoiceOut = findInvoiceOut(id);
+        invoiceOut.setDeleted(!invoiceOut.isDeleted());
 
-        return repository.save(invoiceIn);
+        return repository.save(invoiceOut);
     }
 
     @Override
     @Transactional
-    public InvoiceIn togglePostStatus(Long id) {
-        InvoiceIn invoiceIn = findInvoiceIn(id);
-        invoiceIn.setPosted(!invoiceIn.isPosted());
-        return repository.save(invoiceIn);
+    public InvoiceOut togglePostStatus(Long id) {
+        InvoiceOut invoiceOut = findInvoiceOut(id);
+        invoiceOut.setPosted(!invoiceOut.isPosted());
+        return repository.save(invoiceOut);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
-        InvoiceIn invoiceIn = findInvoiceIn(id);
-        repository.delete(invoiceIn);
+        InvoiceOut invoiceOut = findInvoiceOut(id);
+        repository.delete(invoiceOut);
     }
 
-    private InvoiceIn findInvoiceIn(Long id) {
+    private InvoiceOut findInvoiceOut(Long id) {
         return repository.findById(id)
                 .orElseThrow(() ->
                         new BusinessRuleException("Инвойс не найден"));
     }
 
-    private void populateItems(InvoiceIn invoiceIn,
-                               List<InvoiceInItemRequest> itemRequests,
+    private void populateItems(InvoiceOut invoiceOut,
+                               List<InvoiceOutItemRequest> itemRequests,
                                Map<Long, Product> productsMap) {
         if (itemRequests == null || itemRequests.isEmpty()) {
-            invoiceIn.recalculateTotalAmount();
+            invoiceOut.recalculateTotalAmount();
             return;
         }
 
         int lineNum = 1;
-        for (InvoiceInItemRequest itemReq : itemRequests) {
+        for (InvoiceOutItemRequest itemReq : itemRequests) {
             Product product = productsMap.get(itemReq.getProductId());
             if (product == null) {
                 throw new BusinessRuleException("Товар с ID " + itemReq.getProductId() + " не найден");
             }
 
-            InvoiceInItem item = mapper.toItemEntity(itemReq);
+            InvoiceOutItem item = mapper.toItemEntity(itemReq);
             item.setProduct(product);
             item.setLineNumber(lineNum++);
             item.calculateAmount();
 
-            invoiceIn.addItem(item);
+            invoiceOut.addItem(item);
         }
 
-        invoiceIn.recalculateTotalAmount();
+        invoiceOut.recalculateTotalAmount();
     }
+
 }
 
 

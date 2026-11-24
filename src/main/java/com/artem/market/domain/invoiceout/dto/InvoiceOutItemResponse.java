@@ -5,7 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class InvoiceInItemResponse {
+public class InvoiceOutItemResponse {
 
     private Long id;
     private Integer lineNumber;

@@ -1,11 +1,11 @@
 package com.artem.market.domain.invoiceout.mapper;
 
-import com.artem.market.domain.invoicein.dto.InvoiceInItemRequest;
-import com.artem.market.domain.invoicein.dto.InvoiceInItemResponse;
-import com.artem.market.domain.invoicein.dto.InvoiceInRequest;
-import com.artem.market.domain.invoicein.dto.InvoiceInResponse;
-import com.artem.market.domain.invoicein.entity.InvoiceIn;
-import com.artem.market.domain.invoicein.entity.InvoiceInItem;
+import com.artem.market.domain.invoiceout.dto.InvoiceOutItemRequest;
+import com.artem.market.domain.invoiceout.dto.InvoiceOutItemResponse;
+import com.artem.market.domain.invoiceout.dto.InvoiceOutRequest;
+import com.artem.market.domain.invoiceout.dto.InvoiceOutResponse;
+import com.artem.market.domain.invoiceout.entity.InvoiceOut;
+import com.artem.market.domain.invoiceout.entity.InvoiceOutItem;
 import org.mapstruct.*;
 
 import java.util.List;
@@ -14,9 +14,7 @@ import java.util.List;
         componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
-public interface InvoiceInMapper {
-
-    // --- Entity -> Response ---
+public interface InvoiceOutMapper {
 
     @Mapping(target = "companyId", source = "company.id")
     @Mapping(target = "companyName", source = "company.name")
@@ -26,15 +24,14 @@ public interface InvoiceInMapper {
     @Mapping(target = "contractName", source = "contract.name")
     @Mapping(target = "warehouseId", source = "warehouse.id")
     @Mapping(target = "warehouseName", source = "warehouse.name")
-    InvoiceInResponse toResponse(InvoiceIn entity);
+    InvoiceOutResponse toResponse(InvoiceOut entity);
 
-    List<InvoiceInResponse> toResponseList(List<InvoiceIn> invoices);
+    List<InvoiceOutResponse> toResponseList(List<InvoiceOut> invoices);
 
     @Mapping(target = "productId", source = "product.id")
     @Mapping(target = "productName", source = "product.name")
-    InvoiceInItemResponse toItemResponse(InvoiceInItem item);
+    InvoiceOutItemResponse toItemResponse(InvoiceOutItem item);
 
-    // --- Request -> Entity (Создание) ---
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -43,11 +40,11 @@ public interface InvoiceInMapper {
     @Mapping(target = "partner", ignore = true)
     @Mapping(target = "contract", ignore = true)
     @Mapping(target = "warehouse", ignore = true)
-    @Mapping(target = "items", ignore = true) // Строки добавляем вручную через addItem()
-    @Mapping(target = "posted", constant = "false") // Новый документ всегда черновик
+    @Mapping(target = "items", ignore = true)
+    @Mapping(target = "posted", constant = "false")
     @Mapping(target = "deleted", defaultValue = "false")
     @Mapping(target = "totalAmount", defaultValue = "0")
-    InvoiceIn toEntity(InvoiceInRequest request);
+    InvoiceOut toEntity(InvoiceOutRequest request);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -58,9 +55,7 @@ public interface InvoiceInMapper {
     @Mapping(target = "price", defaultValue = "0")
     @Mapping(target = "quantity", defaultValue = "0")
     @Mapping(target = "amount", defaultValue = "0")
-    InvoiceInItem toItemEntity(InvoiceInItemRequest request);
-
-    // --- Request -> Entity (Обновление существующего черновика) ---
+    InvoiceOutItem toItemEntity(InvoiceOutItemRequest request);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -71,5 +66,5 @@ public interface InvoiceInMapper {
     @Mapping(target = "contract", ignore = true)
     @Mapping(target = "warehouse", ignore = true)
     @Mapping(target = "items", ignore = true)
-    void updateEntityFromRequest(InvoiceInRequest request, @MappingTarget InvoiceIn invoice);
+    void updateEntityFromRequest(InvoiceOutRequest request, @MappingTarget InvoiceOut invoice);
 }

@@ -16,8 +16,6 @@ import java.util.List;
 )
 public interface InvoiceInMapper {
 
-    // --- Entity -> Response ---
-
     @Mapping(target = "companyId", source = "company.id")
     @Mapping(target = "companyName", source = "company.name")
     @Mapping(target = "partnerId", source = "partner.id")
@@ -34,7 +32,7 @@ public interface InvoiceInMapper {
     @Mapping(target = "productName", source = "product.name")
     InvoiceInItemResponse toItemResponse(InvoiceInItem item);
 
-    // --- Request -> Entity (Создание) ---
+
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
@@ -43,8 +41,8 @@ public interface InvoiceInMapper {
     @Mapping(target = "partner", ignore = true)
     @Mapping(target = "contract", ignore = true)
     @Mapping(target = "warehouse", ignore = true)
-    @Mapping(target = "items", ignore = true) // Строки добавляем вручную через addItem()
-    @Mapping(target = "posted", constant = "false") // Новый документ всегда черновик
+    @Mapping(target = "items", ignore = true)
+    @Mapping(target = "posted", constant = "false")
     @Mapping(target = "deleted", defaultValue = "false")
     @Mapping(target = "totalAmount", defaultValue = "0")
     InvoiceIn toEntity(InvoiceInRequest request);
@@ -60,7 +58,6 @@ public interface InvoiceInMapper {
     @Mapping(target = "amount", defaultValue = "0")
     InvoiceInItem toItemEntity(InvoiceInItemRequest request);
 
-    // --- Request -> Entity (Обновление существующего черновика) ---
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

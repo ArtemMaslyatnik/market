@@ -21,7 +21,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class InvoiceServiceImpl implements InvoiceInService {
+public class InvoiceInServiceImpl implements InvoiceInService {
 
     private final InvoiceInRepository repository;
     private final InvoiceInMapper mapper;
@@ -82,9 +82,8 @@ public class InvoiceServiceImpl implements InvoiceInService {
         existing.setPartner(partner);
         existing.setContract(contract);
         existing.setDeleted(targetIsDeleted);
-        existing.setDeleted(targetIsDeleted);
 
-        if (request.getItems() != null) { // перезаписываем табличную часть при обновлении
+        if (request.getItems() != null) {
             existing.clearItems();
             populateItems(existing, request.getItems(), productsMap);
         }

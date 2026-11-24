@@ -1,14 +1,13 @@
 package com.artem.market.domain.invoiceout.dto;
 
 
-import com.artem.market.domain.invoicein.dto.InvoiceInItemResponse;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class InvoiceInResponse {
+public class InvoiceOutResponse {
     private Long id;
     private String number;
     private LocalDateTime date;
@@ -24,5 +23,5 @@ public class InvoiceInResponse {
     private String warehouseName;
     private BigDecimal totalAmount;
 
-    private List<InvoiceInItemResponse> items;
+    private List<InvoiceOutItemResponse> items;
 }
