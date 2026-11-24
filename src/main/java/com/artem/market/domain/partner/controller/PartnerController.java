@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/partners")
 @RequiredArgsConstructor
-@Tag(name = "3. Справочник Контрагентов")
+@Tag(name = "1.4. Справочник Контрагентов")
 public class PartnerController {
 
     private final PartnerService service;

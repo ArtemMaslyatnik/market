@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/companies")
 @RequiredArgsConstructor
-@Tag(name = "2. Catalog companies")
+@Tag(name = "1.2. Catalog companies")
 public class CompanyController {
 
     private final CompanyService service;

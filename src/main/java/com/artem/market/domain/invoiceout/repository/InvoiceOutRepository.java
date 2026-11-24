@@ -11,10 +11,10 @@ import java.util.Optional;
 @Repository
 public interface InvoiceOutRepository extends JpaRepository<InvoiceOut, Long> {
     @Override
-    @EntityGraph(attributePaths = {"company", "partner", "contract", "warehouse"}) // <--- ДОБАВЛЕНО
+    @EntityGraph(attributePaths = {"company", "partner", "contract", "warehouse"})
     List<InvoiceOut> findAll();
 
     @Override
-    @EntityGraph(attributePaths = {"company", "partner", "contract", "warehouse", "items", "items.product"}) // <--- ДОБАВЛЕНО
+    @EntityGraph(attributePaths = {"company", "partner", "contract", "warehouse", "items", "items.product"})
     Optional<InvoiceOut> findById(Long id);
 }

@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/warehouses")
 @RequiredArgsConstructor
-@Tag(name = "4. Справочник Складов")
+@Tag(name = "1.6. Справочник Складов")
 public class WarehouseController {
 
     private final WarehouseService service;

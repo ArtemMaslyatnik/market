@@ -16,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/invoice-in")
 @RequiredArgsConstructor
-@Tag(name = "1. Document incoming invoice")
+@Tag(name = "1.1. Document incoming invoice")
 public class InvoiceInController {
 
     private final InvoiceInFacade invoiceInFacade;
