@@ -24,13 +24,13 @@ public class InvoiceInItem extends AbstractDocumentItem {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @Column(nullable = false, precision = 15, scale = 2)
+    @Column(precision = 15, scale = 2)
     private BigDecimal price = BigDecimal.ZERO;
 
-    @Column(nullable = false, precision = 20, scale = 3)
+    @Column(precision = 20, scale = 3)
     private BigDecimal quantity = BigDecimal.ZERO;
 
-    @Column(nullable = false, precision = 15, scale = 2)
+    @Column(precision = 15, scale = 2)
     private BigDecimal amount = BigDecimal.ZERO;
 
 

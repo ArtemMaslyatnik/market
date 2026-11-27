@@ -126,6 +126,7 @@ public class InvoiceInFacade {
         }
         return items.stream()
                 .map(InvoiceInItemRequest::getProductId)
+                .filter(java.util.Objects::nonNull)
                 .distinct()
                 .collect(Collectors.toMap(Function.identity(), productService::getById));
     }

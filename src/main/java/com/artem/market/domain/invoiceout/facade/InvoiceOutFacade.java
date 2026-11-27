@@ -126,6 +126,7 @@ public class InvoiceOutFacade {
         }
         return items.stream()
                 .map(InvoiceOutItemRequest::getProductId)
+                .filter(java.util.Objects::nonNull)
                 .distinct()
                 .collect(Collectors.toMap(Function.identity(), productService::getById));
     }
